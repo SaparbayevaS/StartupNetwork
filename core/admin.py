@@ -1,37 +1,39 @@
 from django.contrib import admin
-<<<<<<< HEAD
-from .models import UserProfile,Category,Idea,Vote,Comment
+from unfold.admin import ModelAdmin
+from .models import User,Category,Idea,IdeaCategory,Vote,Comment
 
-@admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display=('user','total_likes','is_deleted')
-    search_fields=('user__username',)
-    
+@admin.register(User)
+class UserAdmin(ModelAdmin):
+    list_display = ("id", "username", "email", "full_name", "bio", "created_at", "updated_at", "is_deleted", "deleted_at")
+    list_filter = ["bio"]
+    search_fields = ["username", "email", "full_name", "bio"]
+
 @admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display=('name','is_deleted')
-    
+class CategoryAdmin(ModelAdmin):
+    list_display = ("id", "name", "description", "created_at", "updated_at", "is_deleted", "deleted_at")
+    list_filter = ["description"]
+    search_fields = ["name"]
+
 @admin.register(Idea)
-class IdeaAdmin(admin.ModelAdmin):
-    list_display=('title','author','rating','views','is_deleted','created_at')
-    search_fields=('title','description','author__username')
-    list_filter=('readiness','category')
-    
-@admin.register(Vote)
-class VoteAdmin(admin.ModelAdmin):
-    list_display=('user','idea','value','is_deleted','created_at')
-    
+class IdeaAdmin(ModelAdmin):
+    list_display = ("id", "title", "description", "status", "author", "created_at", "updated_at", "is_deleted", "deleted_at")
+    list_filter = ["status"]
+    search_fields = ["title", "author"]
+
+@admin.register(IdeaCategory)
+class IdeaCategoryAdmin(ModelAdmin):
+    list_display = ("id", "idea", "category", "created_at", "updated_at", "is_deleted", "deleted_at")
+    list_filter = ["category"]
+    search_fields = ["idea", "category"]
+
 @admin.register(Comment)
-class CommentAdmin(admin.ModelAdmin):
-    list_display=('author','idea','parent','is_deleted','created_at')
-    search_fields=('content','author__username')
-=======
-from .models import User, Category, Idea, IdeaCategory, Comment
+class CommentyAdmin(ModelAdmin):
+    list_display = ("id", "idea", "author", "content", "created_at", "updated_at", "is_deleted", "deleted_at")
+    list_filter = ["content"]
+    search_fields = ["idea", "author"]
 
-admin.site.register(User)
-admin.site.register(Category)
-admin.site.register(Idea)
-admin.site.register(IdeaCategory)
-admin.site.register(Comment)
-
->>>>>>> origin/bekarys
+@admin.register(Vote)
+class VoteAdmin(ModelAdmin):
+    list_display = ("id", "idea", "user", "is_upvote", "created_at", "updated_at", "is_deleted", "deleted_at")
+    list_filter = ["is_upvote"]
+    search_fields = ["idea", "user"]
