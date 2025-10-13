@@ -1,4 +1,5 @@
 from django.contrib import admin
+<<<<<<< HEAD
 from .models import UserProfile,Category,Idea,Vote,Comment
 
 @admin.register(UserProfile)
@@ -24,3 +25,13 @@ class VoteAdmin(admin.ModelAdmin):
 class CommentAdmin(admin.ModelAdmin):
     list_display=('author','idea','parent','is_deleted','created_at')
     search_fields=('content','author__username')
+=======
+from .models import User, Category, Idea, IdeaCategory, Comment
+
+admin.site.register(User)
+admin.site.register(Category)
+admin.site.register(Idea)
+admin.site.register(IdeaCategory)
+admin.site.register(Comment)
+
+>>>>>>> origin/bekarys
