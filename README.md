@@ -1,7 +1,51 @@
-StartupNetwork
-A platform where people can share startup ideas, find teammates, vote on ideas, and leave comments.
-Team:
-Saparbayeva Sabina
-Sherman Bekarys
-Darmen Daulet
+# 🚀 StartupNetwork
 
+**StartupNetwork** — это платформа, где пользователи могут делиться идеями стартапов, находить единомышленников, голосовать за идеи и оставлять комментарии.  
+Проект создан, чтобы объединить студентов, IT-специалистов и предпринимателей, которые хотят воплотить свои идеи в жизнь.  
+
+---
+
+## 🌟 Основные возможности
+
+- 💡 **Публикация стартап-идей** — делитесь своими проектами и получайте обратную связь.  
+- 👥 **Поиск команды** — находите единомышленников и специалистов по интересам.  
+- 👍 **Голосование** — поддерживайте лучшие идеи.  
+- 💬 **Комментарии** — обсуждайте и развивайте проекты вместе с сообществом.  
+- 🔍 **Фильтрация и поиск** — легко находите нужные идеи по ключевым словам, категориям и городам.  
+
+---
+
+## 🧑‍💻 Команда проекта
+
+| Участник | Роль | GitHub |
+|-----------|------|--------|
+| **Saparbayeva Sabina** | Frontend Developer / UX Designer | — |
+| **Sherman Bekarys** | Backend Developer | — |
+| **Darmen Daulet** | Fullstack Developer / Project Lead | — |
+
+---
+
+## 🏗️ Технологии проекта
+
+**Frontend:**  
+- React  
+- Redux Toolkit  
+- React Router  
+- Tailwind CSS  
+
+**Backend:**  
+- Django / Django REST Framework  
+- PostgreSQL  
+
+**Прочее:**  
+- Docker (опционально)  
+- Git / GitHub  
+
+---
+
+## ⚙️ Установка и запуск проекта
+
+### 🔽 1. Клонирование репозитория
+```bash
+git clone https://github.com/<your-username>/StartupNetwork.git
+cd StartupNetwork
