@@ -1,31 +1,28 @@
 from django.db import models
-from django.contrib.auth.models import User
-
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-
 from django.utils import timezone
-from django.core.exceptions import ValidationError
+
 
 class AbstactSoftDeletableModel(models.Model):
-    is_deleted =models.BooleanField(default=False)
-    deleted_at =models.DateTimeField(null=True,blank=True)
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
     
-    def delete(self,using=None,keep_parents=False):
-        self.is_deleted=True
-        self.deleted_at=timezone.now()
-        self.save(update_fields=['is_deleted','deleted_at'])
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.deleted_at = timezone.now()
+        self.save(update_fields=['is_deleted', 'deleted_at'])
         
-    def hard_delete(self,using=None,keep_parents=False):
-        super().delete(using=using,keep_parents=keep_parents)
+    def hard_delete(self, using=None, keep_parents=False):
+        super().delete(using=using, keep_parents=keep_parents)
         
     class Meta:
-        abstract =True
-        
+        abstract = True
+
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError("Email is required")
-
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -35,6 +32,11 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
 
         return self.create_user(email, password, **extra_fields)
 
@@ -51,27 +53,55 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, AbstactSoftDeletableModel):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
+
     def __str__(self):
         return self.email
+
 
 class UserProfile(AbstactSoftDeletableModel):
-    user=models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile')
-    bio=models.ImageField(upload_to='avatars/0',null=True,blank=True)
-    
-    total_likes=models.IntegerField(default=0)
-    
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    total_likes = models.IntegerField(default=0)
+
     def __str__(self):
-        return self.email
-    
+        return self.user.email
+
+
 class Category(models.Model):
-    pass
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
 
 class Idea(models.Model):
-    pass
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='ideas')
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='ideas')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
 
 class Comment(models.Model):
-    pass
+    idea = models.ForeignKey(Idea, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='comments')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.author.email} on {self.idea.title}"
+
 
 class Vote(models.Model):
-    pass
+    idea = models.ForeignKey(Idea, on_delete=models.CASCADE, related_name='votes')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='votes')
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ('idea', 'user')
+
+    def __str__(self):
+        return f"{self.user.email} voted on {self.idea.title}"
