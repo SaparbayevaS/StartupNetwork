@@ -1,39 +1,22 @@
 from django.contrib import admin
-from unfold.admin import ModelAdmin
-from .models import User,Category,Idea,IdeaCategory,Vote,Comment
+from .models import CustomUser
+from django.contrib.auth.admin import UserAdmin
 
-@admin.register(User)
-class UserAdmin(ModelAdmin):
-    list_display = ("id", "username", "email", "full_name", "bio", "created_at", "updated_at", "is_deleted", "deleted_at")
-    list_filter = ["bio"]
-    search_fields = ["username", "email", "full_name", "bio"]
-
-@admin.register(Category)
-class CategoryAdmin(ModelAdmin):
-    list_display = ("id", "name", "description", "created_at", "updated_at", "is_deleted", "deleted_at")
-    list_filter = ["description"]
-    search_fields = ["name"]
-
-@admin.register(Idea)
-class IdeaAdmin(ModelAdmin):
-    list_display = ("id", "title", "description", "status", "author", "created_at", "updated_at", "is_deleted", "deleted_at")
-    list_filter = ["status"]
-    search_fields = ["title", "author"]
-
-@admin.register(IdeaCategory)
-class IdeaCategoryAdmin(ModelAdmin):
-    list_display = ("id", "idea", "category", "created_at", "updated_at", "is_deleted", "deleted_at")
-    list_filter = ["category"]
-    search_fields = ["idea", "category"]
-
-@admin.register(Comment)
-class CommentyAdmin(ModelAdmin):
-    list_display = ("id", "idea", "author", "content", "created_at", "updated_at", "is_deleted", "deleted_at")
-    list_filter = ["content"]
-    search_fields = ["idea", "author"]
-
-@admin.register(Vote)
-class VoteAdmin(ModelAdmin):
-    list_display = ("id", "idea", "user", "is_upvote", "created_at", "updated_at", "is_deleted", "deleted_at")
-    list_filter = ["is_upvote"]
-    search_fields = ["idea", "user"]
+@admin.register(CustomUser)
+class CustomUserAdmin(UserAdmin):
+    model = CustomUser
+    list_display = ('email', 'full_name', 'is_staff', 'is_active')
+    list_filter = ('is_staff', 'is_active')
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        ('Personal Info', {'fields': ('full_name', 'bio')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions')}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'full_name', 'bio', 'password1', 'password2', 'is_staff', 'is_active')}
+        ),
+    )
+    search_fields = ('email',)
+    ordering = ('email',)
