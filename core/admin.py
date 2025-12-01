@@ -1,26 +1,22 @@
 from django.contrib import admin
-from .models import UserProfile,Category,Idea,Vote,Comment
+from .models import CustomUser
+from django.contrib.auth.admin import UserAdmin
 
-@admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display=('user','total_likes','is_deleted')
-    search_fields=('user__username',)
-    
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display=('name','is_deleted')
-    
-@admin.register(Idea)
-class IdeaAdmin(admin.ModelAdmin):
-    list_display=('title','author','rating','views','is_deleted','created_at')
-    search_fields=('title','description','author__username')
-    list_filter=('readiness','category')
-    
-@admin.register(Vote)
-class VoteAdmin(admin.ModelAdmin):
-    list_display=('user','idea','value','is_deleted','created_at')
-    
-@admin.register(Comment)
-class CommentAdmin(admin.ModelAdmin):
-    list_display=('author','idea','parent','is_deleted','created_at')
-    search_fields=('content','author__username')
+@admin.register(CustomUser)
+class CustomUserAdmin(UserAdmin):
+    model = CustomUser
+    list_display = ('email', 'full_name', 'is_staff', 'is_active')
+    list_filter = ('is_staff', 'is_active')
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        ('Personal Info', {'fields': ('full_name', 'bio')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions')}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'full_name', 'bio', 'password1', 'password2', 'is_staff', 'is_active')}
+        ),
+    )
+    search_fields = ('email',)
+    ordering = ('email',)
