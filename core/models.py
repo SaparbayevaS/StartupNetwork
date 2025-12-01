@@ -1,6 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.utils import timezone
-
 
 class AbstactSoftDeletableModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -16,56 +16,64 @@ class AbstactSoftDeletableModel(models.Model):
     class Meta:
         abstract = True
 
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("Email is required")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
-class User(AbstactSoftDeletableModel):
-    username = models.CharField(max_length=100, unique=True)
-    email = models.CharField(max_length=100, unique=True)
-    full_name = models.CharField(max_length=150)
-    bio = models.TextField()
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        return self.create_user(email, password, **extra_fields)
+
+class CustomUser(AbstractBaseUser, PermissionsMixin, AbstactSoftDeletableModel):
+    email = models.EmailField(unique=True)
+    full_name = models.CharField(max_length=150, blank=True)
+    bio = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
 
     def __str__(self):
-        return self.username
-
+        return self.email
 
 class Category(AbstactSoftDeletableModel):
-    name = models.CharField(max_length=100, unique=True)
-    description = models.TextField()
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
 
     def __str__(self):
         return self.name
 
-
 class Idea(AbstactSoftDeletableModel):
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    status = models.CharField(max_length=10)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ideas")
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    status = models.CharField(max_length=50, default="draft")
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
 
-
-class IdeaCategory(AbstactSoftDeletableModel):
-    idea = models.ForeignKey(Idea, on_delete=models.CASCADE, related_name="idea_categories")
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="category_ideas")
-
-    def __str__(self):
-        return f"{self.idea.title} - {self.category.name}"
-
-
 class Comment(AbstactSoftDeletableModel):
-    idea = models.ForeignKey(Idea, on_delete=models.CASCADE, related_name="comments")
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
+    idea = models.ForeignKey(Idea, on_delete=models.CASCADE)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     content = models.TextField()
 
     def __str__(self):
-        return f"Comment by {self.author.username} on {self.idea.title}"
-
+        return f"Comment by {self.author.email} on {self.idea.title}"
 
 class Vote(AbstactSoftDeletableModel):
-    idea = models.ForeignKey(Idea, on_delete=models.CASCADE, related_name="votes")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="votes")
-    is_upvote = models.BooleanField()
+    idea = models.ForeignKey(Idea, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    is_upvote = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.user.username} → {self.idea.title} ({'Up' if self.is_upvote else 'Down'})"
+        return f"{'Upvote' if self.is_upvote else 'Downvote'} by {self.user.email}"

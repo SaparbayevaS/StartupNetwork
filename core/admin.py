@@ -1,39 +1,33 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .models import User,Category,Idea,IdeaCategory,Vote,Comment
+from .models import CustomUser, Category, Idea, Comment, Vote
 
-@admin.register(User)
-class UserAdmin(ModelAdmin):
-    list_display = ("id", "username", "email", "full_name", "bio", "created_at", "updated_at", "is_deleted", "deleted_at")
-    list_filter = ["bio"]
-    search_fields = ["username", "email", "full_name", "bio"]
+@admin.register(CustomUser)
+class CustomUserAdmin(ModelAdmin):
+    list_display = ("id", "email", "full_name", "bio", "is_staff", "is_active", "created_at", "updated_at", "is_deleted", "deleted_at")
+    list_filter = ["is_staff", "is_active"]
+    search_fields = ["email", "full_name", "bio"]
 
 @admin.register(Category)
 class CategoryAdmin(ModelAdmin):
     list_display = ("id", "name", "description", "created_at", "updated_at", "is_deleted", "deleted_at")
-    list_filter = ["description"]
-    search_fields = ["name"]
+    list_filter = ["name"]
+    search_fields = ["name", "description"]
 
 @admin.register(Idea)
 class IdeaAdmin(ModelAdmin):
     list_display = ("id", "title", "description", "status", "author", "created_at", "updated_at", "is_deleted", "deleted_at")
     list_filter = ["status"]
-    search_fields = ["title", "author"]
-
-@admin.register(IdeaCategory)
-class IdeaCategoryAdmin(ModelAdmin):
-    list_display = ("id", "idea", "category", "created_at", "updated_at", "is_deleted", "deleted_at")
-    list_filter = ["category"]
-    search_fields = ["idea", "category"]
+    search_fields = ["title", "author__email"]
 
 @admin.register(Comment)
-class CommentyAdmin(ModelAdmin):
+class CommentAdmin(ModelAdmin):
     list_display = ("id", "idea", "author", "content", "created_at", "updated_at", "is_deleted", "deleted_at")
-    list_filter = ["content"]
-    search_fields = ["idea", "author"]
+    list_filter = ["idea"]
+    search_fields = ["content", "author__email"]
 
 @admin.register(Vote)
 class VoteAdmin(ModelAdmin):
     list_display = ("id", "idea", "user", "is_upvote", "created_at", "updated_at", "is_deleted", "deleted_at")
     list_filter = ["is_upvote"]
-    search_fields = ["idea", "user"]
+    search_fields = ["user__email", "idea__title"]
