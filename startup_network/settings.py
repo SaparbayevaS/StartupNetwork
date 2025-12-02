@@ -24,6 +24,8 @@ environ.Env.read_env(os.path.join(BASE_DIR,'.env'))
 
 SECRET_KEY=env('SECRET_KEY')
 DEBUG=env('DEBUG',default=True)
+AUTH_USER_MODEL = 'core.CustomUser'
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -53,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -96,6 +99,12 @@ DATABASES = {
     }
 }
 
+REST_FRAMEWORK = {
+   "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -137,7 +146,4 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
 AUTH_USER_MODEL = 'core.CustomUser'
-
