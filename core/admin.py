@@ -19,4 +19,6 @@ class CustomUserAdmin(UserAdmin):
         ),
     )
     search_fields = ('email',)
+
     ordering = ('email',)
+
