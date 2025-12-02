@@ -1,81 +1,10 @@
-from rest_framework import serializers
-<<<<<<< HEAD
-from .models import Idea, Comment, Category, Vote
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = "__all__"
-        
-class CommentSerializer(serializers.ModelSerializer):
-    author_email = serializers.EmailField(source='author.email', read_only=True)
-    
-    class Meta:
-        model = Comment
-        fields = "__all__"
-        
-class VoteSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Vote
-        fields = "__all__"
-
-class IdeaSerializer(serializers.ModelSerializer):
-    author_email = serializers.EmailField(source='author.email', read_only=True)
-    comments =CommentSerializer(many=True, read_only=True)
-    categories = serializers.SerializerMethodField()
-    
-=======
-from core.models import CustomUser, Idea, Comment
+from rest_framework.serializers import ModelSerializer, CharField, EmailField, SerializerMethodField, HiddenField, PrimaryKeyRelatedField, CurrentUserDefault
+from core.models import CustomUser, Idea, Comment, Category, Vote
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomUser
-        fields = ["id", "email", "full_name", "bio"]
 
-class IdeaSerializer(serializers.ModelSerializer):
-    author = UserSerializer(read_only=True)
-
->>>>>>> origin/bekarys
-    class Meta:
-        model = Idea
-        fields = [
-            "id",
-            "title",
-            "description",
-            "status",
-<<<<<<< HEAD
-            "author_email",
-            "comments",
-            "categories",
-            "created_at",
-        ]
-    def get_categories(self, obj):
-        return [ic.category.name for ic in obj.idea_categories.all()]
-=======
-            "author",
-            "created_at",
-            "updated_at",
-        ]
-
-class CommentSerializer(serializers.ModelSerializer):
-    author = UserSerializer(read_only=True)
-
-    class Meta:
-        model = Comment
-        fields = [
-            "id",
-            "idea",
-            "author",
-            "content",
-            "created_at",
-            "updated_at",
-        ]
-
-
-class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+class RegisterSerializer(ModelSerializer):
+    password = CharField(write_only=True)
 
     class Meta:
         model = CustomUser
@@ -88,13 +17,59 @@ class RegisterSerializer(serializers.ModelSerializer):
             full_name=validated_data.get("full_name", "")
         )
 
+
 class LoginSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-
         token["email"] = user.email
         token["full_name"] = user.full_name
-
         return token
->>>>>>> origin/bekarys
+
+
+class CategorySerializer(ModelSerializer):
+    class Meta:
+        model = Category
+        fields = "__all__"
+
+
+class CommentSerializer(ModelSerializer):
+    author_email = EmailField(source='author.email', read_only=True)
+    idea = PrimaryKeyRelatedField(queryset=Idea.objects.all())
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'content', 'author_email', 'idea', 'created_at', 'updated_at', 'deleted_at']
+
+
+class VoteSerializer(ModelSerializer):
+    user = HiddenField(default=CurrentUserDefault())
+    idea = PrimaryKeyRelatedField(queryset=Idea.objects.all())
+
+    class Meta:
+        model = Vote
+        fields = "__all__"
+
+
+class IdeaSerializer(ModelSerializer):
+    author_email = EmailField(source='author.email', read_only=True)
+    comments = CommentSerializer(many=True, read_only=True)
+    category_name = SerializerMethodField()
+
+    class Meta:
+        model = Idea
+        fields = [
+            "id",
+            "title",
+            "description",
+            "author_email",
+            "comments",
+            "category",
+            "category_name",
+            "created_at",
+            "updated_at",
+            "deleted_at"
+        ]
+
+    def get_category_name(self, obj):
+        return obj.category.name if obj.category else None
