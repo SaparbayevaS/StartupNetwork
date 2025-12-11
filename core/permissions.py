@@ -9,7 +9,5 @@ class IsOwnerOrReadOnly(BasePermission):
         if hasattr(obj, "author"):
             return obj.author == request.user
 
-        if hasattr(obj, "author"):
-            return obj.author == request.user
 
         return False

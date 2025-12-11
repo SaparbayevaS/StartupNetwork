@@ -1,6 +1,7 @@
 from rest_framework import viewsets, permissions, filters, generics
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework.viewsets import ViewSet
 from .models import Idea, Comment, Category, Vote
 from .serializers import (
     RegisterSerializer,

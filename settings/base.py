@@ -10,54 +10,43 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-from pathlib import Path
-import environ
+
+# Python modules
 import os
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-env=environ.Env(
-    DEBUG=(bool,False)
-)
-
-environ.Env.read_env(os.path.join(BASE_DIR,'.env'))
-
-SECRET_KEY=env('SECRET_KEY')
-DEBUG=env('DEBUG',default=True)
-AUTH_USER_MODEL = 'core.CustomUser'
+# Project modules
+from settings.conf import *  # noqa: F403
 
 
+# ----------------------------------------------
+# Apps
+#
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT_URLCONF = 'settings.urls'
+WSGI_APPLICATION = 'settings.wsgi.application'
+ASGI_APPLICATION = "settings.asgi.application"
+AUTH_USER_MODEL = "core.CustomUser"
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-s(0q0lw=c&frprkk(eos1&98ww98=kjne_*tt@lo93xk0w)84e'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
-
-# Application definition
-
-INSTALLED_APPS = [
-
+DJANGO_AND_THIRD_PARTY_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',
     'drf_spectacular',
+    'debug_toolbar',
 ]
 
+PROJECT_APPS = [
+    'core',
+]
+
+INSTALLED_APPS = DJANGO_AND_THIRD_PARTY_APPS + PROJECT_APPS
+
+# ----------------------------------------------
+# Middleware | Templates | Validators
+#
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -66,9 +55,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
-
-ROOT_URLCONF = 'startup_network.urls'
 
 TEMPLATES = [
     {
@@ -86,29 +74,6 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'startup_network.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-REST_FRAMEWORK = {
-   "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
-}
-
-# Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -124,26 +89,20 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+# ----------------------------------------------
 # Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
-
+#
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
-
+# ----------------------------------------------
+# Static | Media
+#
 STATIC_URL = 'static/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_URL = "media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-AUTH_USER_MODEL = 'core.CustomUser'
