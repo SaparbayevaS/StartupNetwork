@@ -34,8 +34,11 @@ DJANGO_AND_THIRD_PARTY_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt',
     'drf_spectacular',
     'debug_toolbar',
+    'django_extensions',
 ]
 
 PROJECT_APPS = [
@@ -88,6 +91,16 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# ----------------------------------------------
+# Database
+#
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',  # движок базы данных
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),  # путь к файлу базы
+    }
+}
 
 # ----------------------------------------------
 # Internationalization

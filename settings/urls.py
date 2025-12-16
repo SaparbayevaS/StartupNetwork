@@ -1,3 +1,9 @@
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+
+from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -9,23 +15,18 @@ from drf_spectacular.views import (
     SpectacularRedocView,
 )
 
-from django.contrib import admin
-from django.urls import path, include
-from django.conf import settings
-from django.conf.urls.static import static
-
-from core.views import IdeaViewSet, CommentViewSet
-from rest_framework.routers import DefaultRouter
+from core.views import IdeaViewSet, CommentViewSet, VoteViewSet
 
 router = DefaultRouter()
-router.register(r"ideas", IdeaViewSet)
-router.register(r"comments", CommentViewSet)
+router.register(r"ideas", IdeaViewSet, basename="idea")
+router.register(r"comments", CommentViewSet, basename="comment")
+router.register(r"votes", VoteViewSet, basename="vote")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Core app
-    path("api/auth/", include("core.urls")),
+    path("api/auth/", include("core.urls")),  # auth endpoints
     path("api/", include(router.urls)),
 
     # JWT endpoints
@@ -41,7 +42,7 @@ urlpatterns = [
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-# ⬇⬇⬇ Debug Toolbar — ПРАВИЛЬНО ⬇⬇⬇
+# Debug Toolbar
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns += [

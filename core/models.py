@@ -102,4 +102,4 @@ class Vote(AbstactSoftDeletableModel):
         unique_together = ('idea', 'user')
 
     def __str__(self):
-        return f"{self.user.email} voted on {self.idea.title}"
+        return f"{self.user.email} voted on {self.idea.title}"    
