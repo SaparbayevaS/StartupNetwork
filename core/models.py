@@ -5,14 +5,17 @@ from django.utils import timezone
 
 class AbstactSoftDeletableModel(Model):
     """
-    Your docstring text.
+    Base model for soft delete.
+    Contains created, updated, deleted time fields.
     """
     created_at = DateTimeField(auto_now_add=True)
     updated_at = DateTimeField(auto_now=True)
     deleted_at = DateTimeField(null=True, blank=True)
     
     def delete(self, using: str = None, keep_parents: bool = False) -> None:
-        """..."""
+        """
+        Marks object as deleted by setting deleted_at time.
+        """
         self.deleted_at = timezone.now()
         self.save(update_fields=['deleted_at'])
            
@@ -21,7 +24,14 @@ class AbstactSoftDeletableModel(Model):
 
 
 class CustomUserManager(BaseUserManager):
+    """
+    Manager for CustomUser model.
+    Used to create users and superusers.
+    """
     def create_user(self, email, password=None, **extra_fields):
+        """
+        Created a user with email and password.
+        """
         if not email:
             raise ValueError("Email is required")
 
@@ -32,6 +42,9 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
+        """
+        Created a superuser with admin permissions.
+        """
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
@@ -43,6 +56,10 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin, AbstactSoftDeletableModel):
+    """
+    Custom user mmodel.
+    Uses email as login field.
+    """
     email = EmailField(unique=True)
     full_name = CharField(max_length=150, blank=True)
     bio = TextField(blank=True)
@@ -57,18 +74,23 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, AbstactSoftDeletableModel):
 
     def __str__(self):
         return self.email
+    
 
-
-class UserProfile(AbstractBaseUser):
+class UserProfile(Model):
+    """
+    User profile model.
+    Connected to CustomUser with one-to-one relation.
+    """
     user = OneToOneField(CustomUser, on_delete=CASCADE, related_name='profile')
-    avatar = ImageField(upload_to='avatars/', null=True, blank=True)
-    total_likes = IntegerField(default=0)
 
     def __str__(self):
-        return self.user.email
+        return f"Profile of {self.user.email}"
 
 
 class Category(AbstactSoftDeletableModel):
+    """
+    Category for ideas.
+    """
     name = CharField(max_length=100)
 
     def __str__(self):
@@ -76,6 +98,10 @@ class Category(AbstactSoftDeletableModel):
 
 
 class Idea(AbstactSoftDeletableModel):
+    """
+    Idea model.
+    Contains title, description, category and author.
+    """
     title = CharField(max_length=200)
     description = TextField()
     category = ForeignKey(Category, on_delete=CASCADE, related_name='ideas')
@@ -86,6 +112,9 @@ class Idea(AbstactSoftDeletableModel):
 
 
 class Comment(AbstactSoftDeletableModel):
+    """
+    Comment model for ideas.
+    """
     idea = ForeignKey(Idea, on_delete=CASCADE, related_name='comments')
     author = ForeignKey(CustomUser, on_delete=CASCADE, related_name='comments')
     content = TextField()
@@ -95,6 +124,10 @@ class Comment(AbstactSoftDeletableModel):
 
 
 class Vote(AbstactSoftDeletableModel):
+    """
+    Vote model.
+    ONe user can only vote for one idea.
+    """
     idea = ForeignKey(Idea, on_delete=CASCADE, related_name='votes')
     user = ForeignKey(CustomUser, on_delete=CASCADE, related_name='votes')
 

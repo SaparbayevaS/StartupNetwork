@@ -11,13 +11,18 @@ from .views import (
     RefreshTokenAPIView
 )
 
+# ----------------------------
+# Router для ViewSet-ов
+# ----------------------------
 router = DefaultRouter()
 router.register(r'categories', CategoryViewSet, basename='category')
 router.register(r'ideas', IdeaViewSet, basename='idea')
 router.register(r'comments', CommentViewSet, basename='comment')
 router.register(r'votes', VoteViewSet, basename='vote')
 
-
+# ----------------------------
+# URL-шаблоны приложения
+# ----------------------------
 urlpatterns = [
    
     path('register/', RegisterAPIView.as_view(), name='register'),
