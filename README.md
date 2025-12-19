@@ -19,9 +19,9 @@
 
 | Участник | Роль | GitHub |
 |-----------|------|--------|
-| **Saparbayeva Sabina** | Frontend Developer / UX Designer | — |
+| **Darmen Daulet** | Frontend Developer / UX Designer | — |
 | **Sherman Bekarys** | Backend Developer | — |
-| **Darmen Daulet** | Fullstack Developer / Project Lead | — |
+| **Saparbayeva Sabina** | Backend Developer / Project Lead | — |
 
 ---
 
@@ -37,8 +37,7 @@
 - Django / Django REST Framework  
 - PostgreSQL  
 
-**Прочее:**  
-- Docker (опционально)  
+**Прочее:**    
 - Git / GitHub  
 
 ---
