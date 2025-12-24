@@ -46,5 +46,5 @@
 
 ### 🔽 1. Клонирование репозитория
 ```bash
-git clone https://github.com/<your-username>/StartupNetwork.git
+git clone https://github.com/SaparbayevaS/StartupNetwork.git
 cd StartupNetwork
