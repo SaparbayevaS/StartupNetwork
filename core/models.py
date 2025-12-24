@@ -1,6 +1,15 @@
+from typing import Optional, Any
+
 from django.db.models import Model, BooleanField, DateTimeField, EmailField, CharField, TextField, OneToOneField, ImageField, CASCADE, ForeignKey, IntegerField, ManyToManyField
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.utils import timezone
+
+from .constants import (
+    USER_FULL_NAME_MAX_LENGTH,
+    CATEGORY_NAME_MAX_LENGTH,
+    IDEA_TITLE_MAX_LENGTH,
+    PROFILE_DEFAULT_COUNT,
+)
 
 
 class AbstactSoftDeletableModel(Model):
@@ -28,7 +37,7 @@ class CustomUserManager(BaseUserManager):
     Manager for CustomUser model.
     Used to create users and superusers.
     """
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, email: str, password: Optional[str] = None, **extra_fields: Any) -> 'CustomUser':
         """
         Created a user with email and password.
         """
@@ -41,7 +50,7 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(self, email: str, password: Optional[str] = None, **extra_fields: Any) -> 'CustomUser':
         """
         Created a superuser with admin permissions.
         """
@@ -61,7 +70,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, AbstactSoftDeletableModel):
     Uses email as login field.
     """
     email = EmailField(unique=True)
-    full_name = CharField(max_length=150, blank=True)
+    full_name = CharField(max_length=USER_FULL_NAME_MAX_LENGTH, blank=True)
     bio = TextField(blank=True)
     is_active = BooleanField(default=True)
     is_staff = BooleanField(default=False)
@@ -72,7 +81,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin, AbstactSoftDeletableModel):
     REQUIRED_FIELDS = []
 
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.email
     
 
@@ -82,11 +91,11 @@ class UserProfile(Model):
     Connected to CustomUser with one-to-one relation.
     """
     user = OneToOneField(CustomUser, on_delete=CASCADE, related_name='profile')
-    total_ideas = IntegerField(default=0)
-    total_comments = IntegerField(default=0)
-    total_votes = IntegerField(default=0)
+    total_ideas = IntegerField(default=PROFILE_DEFAULT_COUNT)
+    total_comments = IntegerField(default=PROFILE_DEFAULT_COUNT)
+    total_votes = IntegerField(default=PROFILE_DEFAULT_COUNT)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Profile of {self.user.email}"
 
 
@@ -94,9 +103,9 @@ class Category(AbstactSoftDeletableModel):
     """
     Category for ideas.
     """
-    name = CharField(max_length=100)
+    name = CharField(max_length=CATEGORY_NAME_MAX_LENGTH)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -105,12 +114,12 @@ class Idea(AbstactSoftDeletableModel):
     Idea model.
     Contains title, description, category and author.
     """
-    title = CharField(max_length=200)
+    title = CharField(max_length=IDEA_TITLE_MAX_LENGTH)
     description = TextField()
     category = ForeignKey(Category, on_delete=CASCADE, related_name='ideas')
     author = ForeignKey(CustomUser, on_delete=CASCADE, related_name='ideas')
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.title
 
 
@@ -122,7 +131,7 @@ class Comment(AbstactSoftDeletableModel):
     author = ForeignKey(CustomUser, on_delete=CASCADE, related_name='comments')
     content = TextField()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.author.email} on {self.idea.title}"
 
 
@@ -137,5 +146,5 @@ class Vote(AbstactSoftDeletableModel):
     class Meta:
         unique_together = ('idea', 'user')
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.user.email} voted on {self.idea.title}"    

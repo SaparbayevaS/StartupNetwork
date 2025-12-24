@@ -1,12 +1,16 @@
+from typing import Any
+
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import BasePermission, SAFE_METHODS, IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.generics import CreateAPIView
 from rest_framework.status import HTTP_404_NOT_FOUND, HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework.request import Request
 from django.utils import timezone
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
+
 from .models import Idea, Comment, Category, Vote
 from .serializers import (
     RegisterSerializer,
@@ -25,7 +29,7 @@ class IsAuthorOrReadOnly(BasePermission):
     Permission to allow only authors of an object to edit it,
     read oonly access is allowed to all users
     """
-    def has_object_permission(self, request, view, obj):
+    def has_object_permission(self, request: Request, view: Any, obj: Any) -> bool:
         """
         Return True if request method is safe or user is the author
         """
@@ -64,7 +68,7 @@ class CategoryViewSet(ViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     authentication_classes = [JWTAuthentication]
 
-    def list(self, request):
+    def list(self, request: Request) -> Response:
         """
         Return a list of all categories
         """
@@ -72,7 +76,7 @@ class CategoryViewSet(ViewSet):
         serializer = CategorySerializer(queryset, many=True)
         return Response(serializer.data)
 
-    def retrieve(self, request, pk=None):
+    def retrieve(self, request: Request, pk: int | None = None) -> Response:
         """
         Return a single category by id
         """
@@ -83,7 +87,7 @@ class CategoryViewSet(ViewSet):
         serializer = CategorySerializer(category)
         return Response(serializer.data)
 
-    def create(self, request):
+    def create(self, request: Request) -> Response:
         """
         Create a new category
         """
@@ -93,7 +97,7 @@ class CategoryViewSet(ViewSet):
             return Response(serializer.data, status=HTTP_201_CREATED)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-    def update(self, request, pk=None):
+    def update(self, request: Request, pk: int | None = None) -> Response:
         """
         Update an existing category partially
         """
@@ -107,7 +111,7 @@ class CategoryViewSet(ViewSet):
             return Response(serializer.data)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, pk=None):
+    def destroy(self, request: Request, pk: int | None = None) -> Response:
         """
         Soft delete a category by setting deleted_at
         """

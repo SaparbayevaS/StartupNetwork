@@ -15,9 +15,10 @@ from drf_spectacular.views import (
     SpectacularRedocView,
 )
 
-from core.views import IdeaViewSet, CommentViewSet, VoteViewSet
+from core.views import IdeaViewSet, CommentViewSet, VoteViewSet, CategoryViewSet
 
 router = DefaultRouter()
+router.register(r"categories", CategoryViewSet, basename="category")
 router.register(r"ideas", IdeaViewSet, basename="idea")
 router.register(r"comments", CommentViewSet, basename="comment")
 router.register(r"votes", VoteViewSet, basename="vote")

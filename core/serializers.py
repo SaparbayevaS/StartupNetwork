@@ -1,6 +1,9 @@
+from typing import Any, Dict
+
 from rest_framework.serializers import ModelSerializer, CharField, EmailField, SerializerMethodField, HiddenField, PrimaryKeyRelatedField, CurrentUserDefault
-from core.models import CustomUser, Idea, Comment, Category, Vote, UserProfile
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+from core.models import CustomUser, Idea, Comment, Category, Vote, UserProfile
 
 
 class RegisterSerializer(ModelSerializer):
@@ -13,7 +16,7 @@ class RegisterSerializer(ModelSerializer):
         model = CustomUser
         fields = ["email", "full_name", "password"]
 
-    def create(self, validated_data):
+    def create(self, validated_data: Dict[str, Any]) -> CustomUser:
         """
         Create and return a new user with encrypted password.
         """
@@ -29,7 +32,7 @@ class LoginSerializer(TokenObtainPairSerializer):
     Serializer for containing jwt token or login.
     """
     @classmethod
-    def get_token(cls, user):
+    def get_token(cls, user: CustomUser) -> Any:
         """
         Retrun a token with users email and full name included.
         """
@@ -105,5 +108,5 @@ class IdeaSerializer(ModelSerializer):
             "deleted_at"
         ]
 
-    def get_category_name(self, obj):
+    def get_category_name(self, obj: Idea) -> str | None:
         return obj.category.name if obj.category else None
