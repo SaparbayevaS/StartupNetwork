@@ -82,6 +82,9 @@ class UserProfile(Model):
     Connected to CustomUser with one-to-one relation.
     """
     user = OneToOneField(CustomUser, on_delete=CASCADE, related_name='profile')
+    total_ideas = IntegerField(default=0)
+    total_comments = IntegerField(default=0)
+    total_votes = IntegerField(default=0)
 
     def __str__(self):
         return f"Profile of {self.user.email}"
