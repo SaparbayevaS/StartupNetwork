@@ -97,8 +97,8 @@ AUTH_PASSWORD_VALIDATORS = [
 #
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',  # движок базы данных
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),  # путь к файлу базы
+        'ENGINE': 'django.db.backends.sqlite3',  
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),  
     }
 }
 
