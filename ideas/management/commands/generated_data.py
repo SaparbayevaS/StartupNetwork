@@ -1,31 +1,41 @@
 from django.core.management.base import BaseCommand
-from core.models import CustomUser, Category, Idea, IdeaCategory, Comment, Vote
-from django.utils import timezone
 from faker import Faker
 import random
+
+from users.models import CustomUser, UserProfile
+from ideas.models import Category, Idea, IdeaCategory, Comment, Vote
 
 fake = Faker()
 
 
 class Command(BaseCommand):
     """
-    Django management command to generate sample data for testing
+    Django management command to generate sample data for testing.
 
-    Generates:20 users,20 categories,20 ideas and random comments and votes
+    Generates:
+        - 20 users
+        - 20 categories
+        - 20 ideas
+        - Random comments and votes
     """
     help = "Generate sample data for testing (20 users, categories, ideas, comments, votes)"
 
     def handle(self, *args, **options):
+        # ----------------------------
         # Delete old data
+        # ----------------------------
         self.stdout.write(self.style.WARNING("Deleting old data..."))
         Vote.objects.all().delete()
         Comment.objects.all().delete()
         IdeaCategory.objects.all().delete()
         Idea.objects.all().delete()
         Category.objects.all().delete()
+        UserProfile.objects.all().delete()
         CustomUser.objects.all().delete()
 
+        # ----------------------------
         # Create new users
+        # ----------------------------
         users = []
         for _ in range(20):
             user = CustomUser.objects.create_user(
@@ -36,7 +46,9 @@ class Command(BaseCommand):
             )
             users.append(user)
 
-        # Create a category
+        # ----------------------------
+        # Create categories
+        # ----------------------------
         categories = []
         for _ in range(20):
             cat = Category.objects.create(
@@ -44,7 +56,9 @@ class Command(BaseCommand):
             )
             categories.append(cat)
 
-        # Create an idea
+        # ----------------------------
+        # Create ideas
+        # ----------------------------
         ideas = []
         for _ in range(20):
             idea = Idea.objects.create(
@@ -54,13 +68,17 @@ class Command(BaseCommand):
             )
             ideas.append(idea)
 
-        # Connect idea to category
+        # ----------------------------
+        # Connect ideas to categories
+        # ----------------------------
         for idea in ideas:
             chosen_cats = random.sample(categories, k=random.randint(1, 3))
             for cat in chosen_cats:
                 IdeaCategory.objects.create(idea=idea, category=cat)
 
+        # ----------------------------
         # Create comments
+        # ----------------------------
         for _ in range(20):
             Comment.objects.create(
                 idea=random.choice(ideas),
@@ -68,7 +86,9 @@ class Command(BaseCommand):
                 content=fake.sentence(nb_words=15),
             )
 
+        # ----------------------------
         # Create votes
+        # ----------------------------
         for _ in range(20):
             Vote.objects.create(
                 idea=random.choice(ideas),
